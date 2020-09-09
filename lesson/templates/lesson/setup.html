@@ -1,0 +1,193 @@
+{% extends 'lesson/base.htm' %}
+{% block sectionTitle %}{% endblock %}
+{% block content %}
+
+
+<div style="border-radius:0.8px;text-align:center;font-size:16px;background-color:#ccccc0"> Set Up Lesson Plan </div>
+
+     <div style="text-align:center">Remittals Menu</div>
+
+ <table style="margin-top:01%;margin-bottom:0%" width="100%" class="table  table-bordered" id="dataTables-example">
+        <tr >
+            <td  style="background:blue;font-size:15px">
+                <a title = "Set Up Subject Topic" href="/lesson/set_up/topic=&?{{varer}}" style="color:white"> Topic</a>
+            </td>
+            <td >
+                <a title = "Set Up Contents" href="/lesson/setup_sub/"> Contents </a>
+            </td>
+            <td >
+                <a title ="Set Up Objectives" href="/lesson/set_up/obj"> Objectives</a>
+            </td>
+            <td >
+                <a title ="Set Up Teacher's Activity" href="/lesson/set_up/teacher_activities/">T.A</a></td>
+            <td >
+                <a title ="Set Up Student Activity" href="/lesson/set_up/students_activities/"> S.A</a></td>
+            <td >
+                <a title = "Set Up Instructional Resource" href="/lesson/set_up/resources/"> I.R</a>
+            </td>
+            <td>
+                <a title = "Set Up Instructional Resource" href="/lesson/set_up/evaluation/"> Evaluation Guide</a>
+            </td>             
+            <td >
+                <a title ="Set Up Number of Weekly Lessons" href="/lesson/set_up/lesson_count/">W.L</a>
+            </td>
+        </tr>
+</table>
+
+<div style="border-radius:0px;text-align:center;color:blue;font-size:16px;background-color:#ccccc0">  Set Up Topic  </div>
+
+
+ <table style="margin-top:01%;margin-bottom:0%" width="100%" class="table  table-bordered" id="dataTables-example">
+<form  action="" method="POST"  onsubmit="disable(this)">
+     <tr>
+            <td>
+                {{ form.session.label }}:
+            </td>
+            <td> {{form.session}}</td>
+     </tr>
+     <tr>
+            <td>
+                {{ form.klass.label }}:
+            </td>
+            <td> {{form.klass}}</td>
+     </tr>
+     <tr>
+     <td>
+                {{ form.term.label }}:
+
+            </td>
+            <td>{{form.term}}</td>
+        </tr>
+     <tr>
+           <td>
+                {{ form.subject.label }}:
+            </td>
+            <td>{{form.subject}}</td>
+     </tr>
+     <tr>           
+            <td>{{ form.topic.label }}:</td>
+            <td>{{form.topic}}</td>
+     </tr>
+ <table style="margin-top:01%;margin-bottom:01%" width="100%" class="table  table-bordered" id="dataTables-example">
+    <tr>
+        <td ><input class="btn btn-lg btn-success btn-block" name="submit" type= "submit" value=" :: Add Topic ::"></td>
+    </tr>
+</table>
+
+</form>
+</table>
+
+ <table style="margin-top:0%;margin-bottom:0%" width="100%" class="table  table-bordered" id="dataTables-example">
+<div class="boxu"> </div>
+
+
+</table>
+
+    <script>
+        $(document).ready(function() {
+            var pickerOpts = {
+                showOtherMonths: true,
+                changeMonth: true,
+                changeYear: true,
+                dateFormat:"yy-mm-dd"
+            };
+
+            getclass();
+        });
+    </script>
+
+    <script type="text/javascript" language="javascript">
+        function getclass(){
+            var state = $("#id_session").val() ; // i need session to determine my class
+            //alert(state);
+            var url = "/assessment/getclass/";
+            var i = 0;
+            var data='userid='+state;
+            $("#id_klass").val('');   
+            $("#id_klass").html('');
+            if (state != undefined){
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data:data,
+                    success: function(data){
+                        var options = '';
+                        for (i=0; i<data.length; i++){
+                            options += '<option value="' + data[i] +'">' + data[i] + '</option>'
+                        }
+                        $("#id_klass").append(options);     
+                         getsubjectlesson();               
+
+                    }
+                })
+            }
+        }
+
+    </script>
+
+    <script type="text/javascript" language="javascript">
+        function getsubjectlesson(){
+            //var state = $("#id_session").val() ;
+            var state = $("#id_session").val() + ':'+ $("#id_klass").val();
+            //alert(state)
+            var url = "/assessment/getsubjectless/";
+            var i = 0;
+            var data='userid='+state;
+            $("#id_subject").val('');
+            $("#id_subject").html('');
+            if (state != undefined){
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data:data,
+                    success: function(data){
+                        var options = '';
+                        for (i=0; i<data.length; i++){
+                            options += '<option value="' + data[i] +'">' + data[i] + '</option>'
+                        }
+                        $("#id_subject").append(options);
+                        autoposts();
+                    }
+                })
+            }
+        }
+
+    </script>
+   <script type="text/javascript" >
+        $(document).ready(function() {
+
+            $("#id_subject").change(function () {
+                autoposts();
+            });
+            $("#id_klass").change(function () {
+                getsubjectlesson();
+            });
+            $("#id_term").change(function () {
+                autoposts();
+            });
+        });
+    </script>
+
+<script type="text/javascript" language="javascript">
+        function autoposts(){
+            var state = $("#id_subject").val()+':'+ $("#id_klass").val()+':'+ $("#id_term").val() ;
+            var url = "/lesson/set_up/gettopajax/";
+            var i = 0;
+            var data='userid='+state;
+            //alert(autopost)
+            $.ajax({
+                type:"POST",
+                url:url,
+                data:data,
+                success:function(html) {
+                    $(".boxu").show();
+                    $(".boxu").html(html);
+               }
+            });
+            //alert("error");
+            return false;
+        }
+    </script>
+
+{% endblock %}
+
